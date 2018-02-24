@@ -9,7 +9,16 @@
 import Foundation
 
 /// FBFile is a class representing a file in FileBrowser
-@objc open class FBFile: NSObject {
+@objc open class FBFile: NSObject, NSCoding {
+    struct PropertyKey {
+        //static let displayName = "displayName"
+        //static let isDirectory = "isDirectory"
+        //static let fileExtension = "fileExtension"
+        //static let fileAttributes = "fileAttributes"
+        static let filePath = "filePath"
+        //static let type = "type"
+    }
+    
     /// Display name. String.
     @objc open let displayName: String
     // is Directory. Bool.
@@ -22,6 +31,10 @@ import Foundation
     open let filePath: URL
     // FBFileType
     open let type: FBFileType
+    
+    //Archiving Paths
+    static let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first!
+    static let ArchiveURL = DocumentsDirectory.appendingPathComponent("FBFile_data")
     
     open func delete()
     {
@@ -62,6 +75,23 @@ import Foundation
             }
         }
         self.displayName = filePath.lastPathComponent 
+    }
+    
+    public func encode(with aCoder: NSCoder) {
+        //aCoder.encode(displayName, forKey: PropertyKey.displayName)
+        //aCoder.encode(isDirectory, forKey: PropertyKey.isDirectory)
+        //aCoder.encode(fileExtension, forKey: PropertyKey.fileExtension)
+        //aCoder.encode(fileAttributes, forKey: PropertyKey.fileAttributes)
+        aCoder.encode(filePath, forKey: PropertyKey.filePath)
+        //aCoder.encode(type, forKey: PropertyKey.type)
+    }
+    
+    required convenience public init?(coder aDecoder: NSCoder) {
+        guard let filePath = aDecoder.decodeObject(forKey: PropertyKey.filePath) as? URL else {
+            return nil
+        }
+        
+        self.init(filePath: filePath)
     }
 }
 
